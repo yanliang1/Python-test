@@ -47,5 +47,5 @@ if __name__ == "__main__":
     p2.set_x(300)
     p2.set_y(400)
     print(p1.get_x(),p2.get_x())
-    p1.move(0,0)
+    p1.move(p2.get_x(),p2.get_y())
     print(p1.get_x())
