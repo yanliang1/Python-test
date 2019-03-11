@@ -513,3 +513,225 @@ opencv   开源计算机视觉库
 
 	保存图像:
 		cv2.imwrite(图片名,图片对象)
+
+
+第6天：
+网络爬虫
+
+---------------
+回顾：
+	int float  bool  str  list  tuple  dict
+	类型名(表达式)
+	type(变量)
+
+	序列通用操作
+		+  *  索引(index())  长度(len())  
+		切片
+			序列[起始:结束]  #位置可以为负，表示从右往左计算
+	list	[]
+		append()
+		[位置]
+		del  元素
+		pop()
+		remove(value)
+	tuple	()
+		index()
+		count()
+
+	str
+		find()
+		replace()
+		split()
+		format()
+		strip()
+		join()
+
+	dict
+		{}
+		key value
+		get(key)
+		[key] = value
+		keys()
+		values()
+		items()
+-----------------------------
+1.预备知识
+URL:
+	URI	统一资源标志符 Uniform Resource Identifier
+		URL:统一资源定位符	Universal Resource Locater
+		URN:统一资源名称     Universal Resource Name	
+				ISBN 9787563545919
+
+	例：
+		https://www.baidu.com/abc/index.html
+
+	超文本：Hypter Text
+		网页中不仅可以包含普通的文本，还可以包含图片，音频，视频
+		网页的源代码，就是超文本
+
+	HTTP和HTTPS
+		http:超文本传输协议(Hypter Text Transfer Protocol)
+			用于从网络传输超文本数据到本地浏览器 的一种传输协议(规则)
+		https:(Hypter Text Transfer Protocol over Secure Socket Layer)http的安全版本
+
+	http请求过程
+		当向浏览器中输入URL，浏览器会向网站所在的服务器发一个请求，当服务器收到请求后，进行处理和解析，然后返回对应的响应给浏览器。
+		响应中包含了页面的源代码，即超文本。浏览器再对响应进行解析，最终呈现出来。
+
+
+	请求，由客户端向服务器发出，可以分为4个部分：
+		请求方法(Request Method),请求网址(Request URL),请求头(Request Head),请求体(Request Body)
+
+		请求方法:常用两种方法(Get,Post)（用来表名客户的目的）
+			在浏览器输入URL，就是发起一个请求(Get)，请求的参数直接包含在URL中
+			Post请求大多在表单提交时发起，如输入用户名和密码后，点击登录，通常发起Post请求，数据以表单形式(请求体)传输，不会显示在URL中
+
+		请求网址
+			URL(协议，域名，路径，文件名)，用来唯一的确定资源的位置
+
+
+		请求头
+			请求时的附加信息，以便服务器识别，如：
+				Host：域名
+				User-Agent:系统和浏览器的版本信息，在写爬虫程序时，用这个字段来伪装成浏览器
+				Accept-Language：可接受的语言
+				Cookie:主要用于维持当前访问会话
+		请求体
+			Get请求，请求体为空
+			Post请求，请求体承载表单数据
+
+
+	响应
+		由服务器返回给客户端，可分三部分
+			响应状态码(Response Status Code),响应头(Response Header),响应体(Response Body)
+
+		响应状态码:
+			表示服务器的响应状态，如200表示服务器响应成功，302代表页面没找到等 
+			在写爬虫程序时，可以根据状态码，来进行数据处理，如状态码不是200，表示响应失败，则可能要忽略此响应
+
+		响应头
+			Server:		描述服务器信息，如版本，名称等
+			Content-Type：文档类型，如text/html表示返回的是html文档,img/jpeg 
+			Set-Cookie:设置cookies,告诉浏览器，下次请求时要携带此cookie
+			...
+		响应体：
+			响应的正文数据都在响应体中，如请求的是网页，那么响应体就是网页源码，如请求的是图片，那么响应体就是图片的二进制数据，可用Preview预览
+
+
+
+-----------------------------------
+为了更好的爬取数据，需要了解网页的结构
+网页可以分为三大部分：
+	HTML,CSS和JavaScript,三者结合，才能形成一个完善的网页。
+
+	HTML(架构/骨架):
+		Hyper Text Markup Language,超文本标记语言
+		语言：与浏览器沟通的一种方式
+		村记：也称标签，放在尖括号中<>，尖括号成对出现，尖括号中间放的就是超文本
+
+		学习网址：
+		http://www.w3school.com.cn/html/index.asp
+
+
+	CSS(外观/皮肤): 
+		Cascading Style Sheet  层叠样式表
+		样式：指网页中文字的大小，颜色，元素间距，排列等格式
+		层叠：如果在HTML文档中引用了多个样式文件。浏览器能依据层叠机制正常处理
+
+		例：
+			color : #ff0000
+			text-align: center 
+			font: 20px 宋体
+			margin: 10px 10px 10px 0
+
+
+	JavaScript(行为):
+		简称JS，是一种可以在浏览器运行的脚本语言，主要用来实现 在浏览端的动作
+		如：用户交互，数据处理，动画效果等
+
+
+
+
+---------------------------------------------------
+爬虫：
+	简单的说，爬虫就是获取网页并提取和保存信息的自动化程序。
+
+爬虫分类：
+	通用爬虫:通常指搜索引擎的爬虫(如百度新闻)
+	聚焦爬虫:针对特定网站的爬虫(如网易云音乐)
+
+
+爬虫的一般工作流程：
+	1.获取网页
+		向网站服务器发送请求，服务器会返回网页数据。
+		手工执行完全没效率，用第三方库(requests)
+		pip install requests
+
+	2.提取数据
+		获取网页后，就是分析网页源码，从中提取我们需要的数据。
+		正则表达式，较复杂且容易出错。
+		还是用库，如bs4,lxml
+
+
+	3.保存数据
+		提取信息后，一般要保存起来以便后用
+		可保存文本，保存到excel表中，保存到数据库
+
+
+
+
+--------------------------
+requests库的使用：
+	help(requests)
+	用python语言为人类编写的http库，用来向服务器发起请求，同时接受响应。
+	使用方式：
+		1.导入模块
+			import requests
+		2.使用模块中的方法实现相应的功能
+			requests.get()
+			requests.post()
+			response.status_code
+			response.content
+			response.text
+			...
+
+
+
+---------------------------------------
+python文件操作：
+	文件通用操作流程：
+		1.打开文件	open()
+		2.读/写文件	read()/write()
+		3.关闭文件	close()
+	
+
+接口说明：
+	f = open(file, mode='r')
+	参数1：file 表示文件名，一般建议带路径，如 "../a.txt"  "d:/abc/b.txt"
+	参数2：mode 表示打开模式，表明操作意图，默认以只读的方式打开
+			r 	->read 		只读(默认)
+			w   ->write 	只写，如果文件存在，清空再写，不存在，创建再写
+			a 	->append    追加
+			b 	->binary    二进制
+			t 	->text 		文本(默认)
+			+ 	->read and write
+
+		常用打开模式：
+			rt  wb   rw  r+  w+
+
+	返回：返回文件对象，代表要操作的文件
+
+
+	f.write(text)
+	参数：待写入的内容
+	返回：实际写入的字节数
+
+	f.read(size=-1)
+	参数：size 表示要读的字节数，默认为-1，表示所有
+	返回：读到的内容
+
+	f.close()
+
+
+	练习：
+		把requests到的数据保存为html文件
