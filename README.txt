@@ -735,3 +735,116 @@ python文件操作：
 
 	练习：
 		把requests到的数据保存为html文件
+
+
+第8天：
+回顾：
+	
+	爬虫工作流程：
+		1.获取网页数据
+			requests
+				get(url,headers=headers,params=params)
+
+		2.提取数据
+		3.保存数据
+			文件
+			f = open(filename,mode)
+			f.read()  f.write()
+			f.close()
+			目录
+			import os
+			os.mkdirs()
+			os.path.exists()
+
+
+----------------------------------------
+用requests发送post请求：
+	哪些地方会用来post请求？
+		登录注册(post比get更安全)
+		需要传输的数据较多时(post对请求长度没有要求)
+
+		所以，爬虫也需要在这两种情况下模拟浏览器发送post请求
+
+	使用方式：
+		requests.post(url,data=data,headers=headers)
+		注：
+			data是字典
+
+
+命令行参数
+	使用 sys模块实现 
+	在python中用一个列表来保存用户输入的命令行参数，列表的名称：argv
+	如果程序没有任何参数，argv列表中仅保存程序的名字
+
+	使用方式：
+		len(sys.argv)
+		sys.argv[0]
+
+	建议：
+		如果在程序中用到了命令行参数，第一件事要判断参数是否合法
+		如果参数不合法，直接退出，退出方式：
+			sys.exit(退出码)	
+				#退出码：0表示正常退出，其它值表示异常退出
+
+
+
+python程序打包成exe:
+	安装包：
+		pip install pyinstaller
+	测试是否安装成功(查看版本)：
+		pyinstaller -v
+
+	打包步骤：
+		1.把需要打包的程序单独拷贝到某个空的目录下，如 py-exe
+		2.打开命令行(cmd),进入第一步中的目录(cd py-exe)
+		3.执行打包指令
+			pyinstaller -F xxx.py
+		4.最终生成的exe文件存放在当前目录的dist目录下
+
+	配置环境变量：
+		为了在任何目录下都能直接使用打包好的exe文件，需要把exe文件所在的目录添加到 环境变量path中
+
+		复制exe目录名->右键计算击->属性->高级系统设置->环境变量->系统变量->path->编辑
+			如果是win7,把光标定位到最后面，写一个分号，再粘贴路径，再以分号结束，点击确定即可。
+			如果是win10,点击新建，粘贴，确定。
+
+
+
+json字符串
+	利用json库把json字符串转成python类型
+	import json
+	ret = json.loads(json字符串)
+	ret = json.dumps(python类型)
+
+
+
+数据的分析与提取：bs4
+	主要用于解析和提取html/xml数据
+安装：
+	pip install bs4
+
+使用：
+	1.导入模块
+		import bs4
+	2.创建BeautifulSoup对象
+		soup = bs4.BeautifulSoup(html)
+
+	3.获取标签内容
+		soup.标签
+		soup中的标签有两个属性：
+			name
+			attrs	#返回的是字典
+
+	4.相关方法
+	select()用于寻找元素
+	soup.select("div") 	#匹配所有的div标签
+	soup.select("#su")  #匹配id为su的标签
+	soup.select(".lb")  #匹配class为lb的标签
+	soup.select("div span") #匹配所有在div标签内的span标签
+	soup.select("a[href]")	#匹配所有有href属性的a标签
+	soup.select("a[name='tj_login']") #匹配所有name为tj_login的a标签
+
+	select()返回的是列表，可以用get_text()获取其文本
+
+	soup.select("p #link")  #测试效果？？
+
